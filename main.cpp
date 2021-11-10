@@ -1,5 +1,7 @@
 #include "bits/stdc++.h"
 
+#define ROUNDS_NUMBER 16
+
 using namespace std;
 
 
@@ -372,38 +374,13 @@ vector<string> Generate_Subkeys(string key) {
 	return subkeys;
 }
 
-string Round_Function(string left32, string right32, vector<string> subkeys)
-{
-	string output, left, right, ep_output, xor_output, sbox_output, p_output, previous_left = "";
-	for (int i = 0; i < 16; i++)
-	{
-		if (i == 0)
-		{
-			left = left32;
-			right = right32;
-		}
-
-		ep_output = Expansion_Permutations(right);
-		xor_output = XOR(ep_output, subkeys[i]);
-		sbox_output = S_Box(xor_output);
-		p_output = Permutations(sbox_output);
-
-		previous_left = left;
-		left = right;
-		right = XOR(p_output, previous_left);
-
-		output = left + right;
-	}
-	return output;
-}
-
 int main(int argc, char* argv[])
 {
     string choice = argv[1];
 
         if(choice == "encrypt")
         {
-        string plaintext, left,right,key,round_result,encrypted;
+        string plaintext, left,right,key,encrypted;
 		vector<string> subkeys;
 
 		plaintext = Hex_to_Bin(argv[2]);
@@ -415,21 +392,35 @@ int main(int argc, char* argv[])
 		key = Permuted_Choice_1(key);
 		subkeys = Generate_Subkeys(key);
 
-		round_result = Round_Function(left, right, subkeys);
-		left = round_result.substr(32, 32);
-		right = round_result.substr(0, 32);
+        string round_output,ep_output, xor_output, sbox_output, p_output, previous_left = "";
+
+        for ( int i = 0 ; i < ROUNDS_NUMBER ; i++ ){
+		ep_output = Expansion_Permutations(right);
+		xor_output = XOR(ep_output, subkeys[i]);
+
+		sbox_output = S_Box(xor_output);
+		p_output = Permutations(sbox_output);
+		previous_left = left;
+		left = right;
+		right = XOR(p_output, previous_left);
+
+		round_output = left + right;
+        }
+
+        left = round_output.substr(32, 32);
+		right = round_output.substr(0, 32);
 		encrypted = left + right;
 		encrypted = Final_Permutations(encrypted);
 		encrypted = Bin_to_Hex(encrypted);
 
-		cout << encrypted << endl;
+		cout <<"cipher: "<<encrypted << endl;
 
 		return 1;
         }
 
         else if (choice == "decrypt")
         {
-        string crypted, left,right,key,round_result,decrypted;
+        string crypted, left,right,key,decrypted;
 		vector<string> subkeys;
 
         crypted = Hex_to_Bin(argv[2]);
@@ -443,14 +434,29 @@ int main(int argc, char* argv[])
 
         reverse(subkeys.begin(),subkeys.end());
 
-		round_result = Round_Function(left, right, subkeys);
-		left = round_result.substr(32, 32);
-		right = round_result.substr(0, 32);
+        string round_output, ep_output, xor_output, sbox_output, p_output, previous_left = "";
+
+        for ( int i = 0 ; i < ROUNDS_NUMBER ; i++ ){
+		ep_output = Expansion_Permutations(right);
+		xor_output = XOR(ep_output, subkeys[i]);
+
+		sbox_output = S_Box(xor_output);
+		p_output = Permutations(sbox_output);
+		previous_left = left;
+		left = right;
+		right = XOR(p_output, previous_left);
+
+		round_output = left + right;
+        }
+
+
+		left = round_output.substr(32, 32);
+		right = round_output.substr(0, 32);
 		decrypted = left + right;
 		decrypted = Final_Permutations(decrypted);
 		decrypted = Bin_to_Hex(decrypted);
 
-        cout<<decrypted;
+        cout<<"plain: "<<decrypted;
 
         return 1;
         }
