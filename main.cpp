@@ -374,7 +374,7 @@ vector<string> Generate_Subkeys(string key) {
 	return subkeys;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
     string choice = argv[1];
 
@@ -415,7 +415,6 @@ int main(int argc, char* argv[])
 
 		cout <<"cipher: "<<encrypted << endl;
 
-		return 1;
         }
 
         else if (choice == "decrypt")
@@ -458,12 +457,12 @@ int main(int argc, char* argv[])
 
         cout<<"plain: "<<decrypted;
 
-        return 1;
         }
 
         else
         {
             cout<<endl<<"Invalid Parameters";
-            return 0;
         }
+
+		return 0;
 }
