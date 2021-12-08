@@ -8,7 +8,7 @@ The Project Contain 2 Codes<br/>
 1- Build the C++ code <br/>
 `g++ main.cpp -o output`
 or
-`g++ efficient_code.cpp -o output`
-2- run the output with the arguments
-`output encrypt [plain] [key]`
+`g++ efficient_code.cpp -o output`<br/>
+2- run the output with the arguments<br/>
+`output encrypt [plain] [key]`<br/>
 `output decrypt [cipher] [key]`
